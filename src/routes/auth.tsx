@@ -8,6 +8,7 @@ import { Droplets, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
+  ssr: false,
   head: () => ({ meta: [{ title: "Área restrita · Login" }, { name: "robots", content: "noindex" }] }),
   component: AuthPage,
 });
