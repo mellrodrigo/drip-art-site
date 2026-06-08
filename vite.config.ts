@@ -12,4 +12,11 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Build a standalone Node.js server (Nitro `node-server` preset) when you
+  // clone the project and run `npm run build` on your own infrastructure.
+  // Inside Lovable's own build the Cloudflare preset is still forced; this
+  // override only takes effect on self-hosted builds.
+  nitro: {
+    preset: "node-server",
+  },
 });
