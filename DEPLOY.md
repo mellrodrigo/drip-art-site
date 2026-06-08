@@ -57,6 +57,31 @@ pm2 start .output/server/index.mjs --name agua-quente-fria
 pm2 save
 ```
 
+## Deploy na Hostinger
+
+A Hostinger não lista "TanStack Start" porque ele é um framework **Vite** que
+gera um **servidor Node.js**. Então o deploy funciona — basta tratar como uma
+aplicação **Node.js**, e NÃO como site estático.
+
+### Passo a passo (hPanel → Node.js)
+
+1. Em **Websites → Gerenciar → Aplicativo Node.js**, crie um novo app.
+2. Em **Framework/Tipo**, escolha **"Other"** (ou Node.js genérico). Não escolha
+   "Vite" puro, pois aquela opção espera um site estático sem servidor SSR.
+3. **Versão do Node**: 20 ou superior.
+4. **Arquivo de inicialização (startup file)**: `.output/server/index.mjs`
+5. **Comando de build**: `npm install && npm run build`
+6. **Comando de start**: `node .output/server/index.mjs`
+7. Configure as variáveis de ambiente (mesma lista da seção acima) no painel,
+   lembrando que as `VITE_*` precisam existir **antes** do build.
+
+> A Hostinger define a porta automaticamente via variável `PORT` — o servidor
+> Node já a respeita, então não fixe a porta manualmente.
+
+Se o seu plano for de **hospedagem compartilhada estática** (sem suporte a
+Node.js), o SSR não roda lá. Nesse caso use um plano **Cloud/VPS** da Hostinger
+com Node.js, ou publique direto pelo botão **Publish** do Lovable.
+
 ## Docker (opcional)
 
 ```dockerfile
