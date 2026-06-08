@@ -36,6 +36,8 @@ sudo apt update && sudo apt install -y git
 
 ## 2. Clonar e buildar o projeto
 
+### Opção A — VPS por SSH (recomendado)
+
 ```bash
 # Clonar o repositório
 git clone <url-do-seu-repositorio> agua-quente-fria
@@ -44,12 +46,31 @@ cd agua-quente-fria
 # Criar o arquivo de variáveis de ambiente (veja a seção 3)
 nano .env
 
-# Instalar dependências e gerar o build de produção
+# Instalar dependências e gerar o build Node.js de produção
 npm install
-npm run build
+npm run build:node
 ```
 
 O build gera a pasta `.output/` com o servidor Node pronto.
+
+### Opção B — importador Git da Hostinger/hPanel
+
+Se a tela mostrar **"Unsupported framework or invalid project structure"**, isso
+é o detector automático da Hostinger não reconhecendo **TanStack Start**. O
+projeto agora inclui `engines`, `main`, `.nvmrc` e script `start`, mas se o
+detector ainda bloquear a seleção do repositório, use **Other** quando disponível
+ou faça o deploy via **VPS por SSH** acima, que não depende desse detector.
+
+Configurações manuais quando a Hostinger permitir continuar:
+
+```text
+Framework: Other
+Node.js: 20.x
+Build command: npm install && npm run build:node
+Start command: npm run start
+Entry file: .output/server/index.mjs
+Output directory: .output
+```
 
 ---
 
@@ -164,7 +185,7 @@ sudo certbot --nginx -d seudominio.com -d www.seudominio.com
 cd agua-quente-fria
 git pull
 npm install
-npm run build
+npm run build:node
 pm2 restart agua-quente-fria
 ```
 
@@ -178,7 +199,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npm run build
+RUN npm run build:node
 
 FROM node:20-alpine
 WORKDIR /app

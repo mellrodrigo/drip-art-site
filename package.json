@@ -1,12 +1,18 @@
 {
-  "name": "tanstack_start_ts",
+  "name": "agua-quente-fria",
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "engines": {
+    "node": ">=20 <25"
+  },
+  "main": ".output/server/index.mjs",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "build:node": "NITRO_PRESET=node-server vite build",
     "build:dev": "vite build --mode development",
+    "start": "node .output/server/index.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."
