@@ -1,88 +1,176 @@
-# Deploy em Node.js
+# Deploy em VPS (Node.js) — Hostinger
 
-Este projeto usa TanStack Start. Por padrão, dentro do Lovable o build é feito
-para Cloudflare, mas quando você **clona o projeto e roda na sua própria
-infraestrutura**, ele é compilado para um **servidor Node.js standalone**
-(preset `node-server` do Nitro, configurado em `vite.config.ts`).
+> **Importante:** este app é um **TanStack Start com SSR**, ou seja, ele roda
+> como um **servidor Node.js** — não é um site estático. Por isso o assistente
+> de "Criar Site / detectar framework" da Hostinger mostra
+> *"Unsupported framework or invalid project structure"*: aquele fluxo espera
+> arquivos estáticos. **Num VPS isso não acontece** — você mesmo sobe o
+> servidor Node, sem detector de framework.
 
-## Pré-requisitos
+Ao rodar `npm run build` na sua própria infraestrutura, o projeto é compilado
+para um **servidor Node.js standalone** (preset `node-server` do Nitro,
+configurado em `vite.config.ts`).
 
-- Node.js 20+ instalado
-- As variáveis de ambiente do backend (veja abaixo)
+---
 
-## Passos
+## 1. Pré-requisitos no VPS
+
+Acesse o VPS por SSH e instale o Node.js 20+:
 
 ```bash
-# 1. Instalar dependências
+# Instalar nvm e Node 20
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+source ~/.bashrc
+nvm install 20
+nvm use 20
+node -v   # deve mostrar v20.x
+```
+
+Instale também o git (se ainda não tiver):
+
+```bash
+sudo apt update && sudo apt install -y git
+```
+
+---
+
+## 2. Clonar e buildar o projeto
+
+```bash
+# Clonar o repositório
+git clone <url-do-seu-repositorio> agua-quente-fria
+cd agua-quente-fria
+
+# Criar o arquivo de variáveis de ambiente (veja a seção 3)
+nano .env
+
+# Instalar dependências e gerar o build de produção
 npm install
-
-# 2. Gerar o build de produção (Node server)
 npm run build
-
-# 3. Iniciar o servidor
-node .output/server/index.mjs
 ```
 
-Por padrão o servidor sobe na porta `3000`. Para mudar:
+O build gera a pasta `.output/` com o servidor Node pronto.
+
+---
+
+## 3. Variáveis de ambiente
+
+Crie um arquivo `.env` na raiz do projeto **antes do build**:
 
 ```bash
-PORT=8080 node .output/server/index.mjs
-```
-
-## Variáveis de ambiente
-
-Crie um arquivo `.env` (ou configure no seu provedor) com:
-
-```bash
-# Públicas (expostas ao navegador)
+# Públicas (embutidas no bundle durante o build)
 VITE_SUPABASE_URL="https://<seu-projeto>.supabase.co"
 VITE_SUPABASE_PUBLISHABLE_KEY="<sua-publishable-key>"
 VITE_SUPABASE_PROJECT_ID="<seu-project-id>"
 
-# Lado servidor (NÃO expor ao navegador)
+# Lado servidor (lidas em tempo de execução — NÃO expor ao navegador)
 SUPABASE_URL="https://<seu-projeto>.supabase.co"
 SUPABASE_PUBLISHABLE_KEY="<sua-publishable-key>"
 SUPABASE_SERVICE_ROLE_KEY="<sua-service-role-key>"
 ```
 
-> As variáveis `VITE_*` são embutidas no bundle durante o `npm run build`,
-> então precisam estar definidas **antes** de buildar. As demais são lidas em
-> tempo de execução pelo servidor Node.
+> As variáveis `VITE_*` são **embutidas no build**, então precisam existir
+> **antes** de rodar `npm run build`. As demais são lidas em tempo de execução.
 
-## Rodar com PM2 (opcional)
+---
+
+## 4. Iniciar o servidor
+
+```bash
+# Teste rápido (porta padrão 3000)
+node .output/server/index.mjs
+
+# Em outra porta
+PORT=8080 node .output/server/index.mjs
+```
+
+Acesse `http://SEU_IP:3000` para confirmar que está no ar.
+
+---
+
+## 5. Manter rodando com PM2 (recomendado)
 
 ```bash
 npm install -g pm2
+
+# Iniciar (lê o .env automaticamente da pasta do projeto)
 pm2 start .output/server/index.mjs --name agua-quente-fria
+
+# Subir junto com o servidor após reboot
+pm2 startup
 pm2 save
 ```
 
-## Deploy na Hostinger
+Comandos úteis:
 
-A Hostinger não lista "TanStack Start" porque ele é um framework **Vite** que
-gera um **servidor Node.js**. Então o deploy funciona — basta tratar como uma
-aplicação **Node.js**, e NÃO como site estático.
+```bash
+pm2 logs agua-quente-fria   # ver logs
+pm2 restart agua-quente-fria
+pm2 stop agua-quente-fria
+```
 
-### Passo a passo (hPanel → Node.js)
+---
 
-1. Em **Websites → Gerenciar → Aplicativo Node.js**, crie um novo app.
-2. Em **Framework/Tipo**, escolha **"Other"** (ou Node.js genérico). Não escolha
-   "Vite" puro, pois aquela opção espera um site estático sem servidor SSR.
-3. **Versão do Node**: 20 ou superior.
-4. **Arquivo de inicialização (startup file)**: `.output/server/index.mjs`
-5. **Comando de build**: `npm install && npm run build`
-6. **Comando de start**: `node .output/server/index.mjs`
-7. Configure as variáveis de ambiente (mesma lista da seção acima) no painel,
-   lembrando que as `VITE_*` precisam existir **antes** do build.
+## 6. Nginx como reverse proxy (porta 80/443 + domínio)
 
-> A Hostinger define a porta automaticamente via variável `PORT` — o servidor
-> Node já a respeita, então não fixe a porta manualmente.
+Para servir no seu domínio com HTTPS, coloque o Nginx na frente do Node:
 
-Se o seu plano for de **hospedagem compartilhada estática** (sem suporte a
-Node.js), o SSR não roda lá. Nesse caso use um plano **Cloud/VPS** da Hostinger
-com Node.js, ou publique direto pelo botão **Publish** do Lovable.
+```bash
+sudo apt install -y nginx
+sudo nano /etc/nginx/sites-available/agua-quente-fria
+```
 
-## Docker (opcional)
+Conteúdo:
+
+```nginx
+server {
+    listen 80;
+    server_name seudominio.com www.seudominio.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+Ativar e recarregar:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/agua-quente-fria /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+### HTTPS gratuito (Let's Encrypt)
+
+```bash
+sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d seudominio.com -d www.seudominio.com
+```
+
+---
+
+## 7. Atualizar o site depois de mudanças
+
+```bash
+cd agua-quente-fria
+git pull
+npm install
+npm run build
+pm2 restart agua-quente-fria
+```
+
+---
+
+## Alternativa com Docker
 
 ```dockerfile
 FROM node:20-alpine AS build
@@ -99,3 +187,18 @@ ENV PORT=3000
 EXPOSE 3000
 CMD ["node", ".output/server/index.mjs"]
 ```
+
+```bash
+docker build -t agua-quente-fria .
+docker run -d -p 3000:3000 --env-file .env --name agua agua-quente-fria
+```
+
+---
+
+## Não tem VPS?
+
+Se você só tem **hospedagem compartilhada/estática** da Hostinger (sem Node.js),
+o SSR não roda lá. Nesse caso:
+- contrate um plano **VPS** da Hostinger (a partir do KVM 1), **ou**
+- publique direto pelo botão **Publish** do Lovable, que hospeda o SSR
+  automaticamente e permite conectar seu domínio próprio.
