@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, Droplets, Loader2, LogOut, Trash2, Upload } from "lucide-react";
 
@@ -56,7 +56,7 @@ function AuthPage() {
     });
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -140,7 +140,7 @@ function AdminPage() {
     queryFn: fetchGalleryPhotos,
   });
 
-  const handleUpload = async (e: React.FormEvent) => {
+  const handleUpload = async (e: FormEvent) => {
     e.preventDefault();
     const file = fileRef.current?.files?.[0];
     if (!file) {
