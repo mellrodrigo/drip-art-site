@@ -6,7 +6,7 @@ export const siteConfig = {
   // Telefone no formato internacional, somente números (DDI + DDD + número)
   whatsapp: "5514998629458",
   phoneDisplay: "(14) 99862-9458",
-  email: "contato@aquatherm.com.br",
+  email: "contato@renatohidraulica.com.br",
   city: "São Paulo e Região",
   whatsappMessage: "Olá! Vim pelo site e gostaria de um orçamento.",
 };
