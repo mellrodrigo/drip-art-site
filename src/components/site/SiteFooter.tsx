@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { Droplets } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
 
@@ -15,9 +14,9 @@ export function SiteFooter() {
         <p className="text-center text-sm text-muted-foreground">
           © {new Date().getFullYear()} {siteConfig.name} · {siteConfig.tagline}
         </p>
-        <Link to="/admin" className="text-xs text-muted-foreground/70 transition-colors hover:text-foreground">
+        <a href="#/admin" className="text-xs text-muted-foreground/70 transition-colors hover:text-foreground">
           Área restrita
-        </Link>
+        </a>
       </div>
     </footer>
   );
