@@ -41,12 +41,22 @@ export function GallerySection() {
                 key={p.id}
                 className="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-border shadow-soft"
               >
-                <img
-                  src={p.signedUrl}
-                  alt={p.title ?? "Trabalho realizado"}
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                {p.type === "video" ? (
+                  <video
+                    src={p.signedUrl}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={p.signedUrl}
+                    alt={p.title ?? "Trabalho realizado"}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                )}
                 {(p.title || p.category) && (
                   <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
                     {p.category && (
