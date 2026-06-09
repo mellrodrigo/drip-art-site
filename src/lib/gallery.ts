@@ -47,5 +47,6 @@ export async function fetchGalleryPhotos(): Promise<GalleryPhoto[]> {
   return data.map((p) => ({
     ...p,
     signedUrl: urlByPath.get(p.storage_path) ?? "",
+    type: getMediaType(p.storage_path),
   }));
 }
