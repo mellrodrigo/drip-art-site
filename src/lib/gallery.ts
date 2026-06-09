@@ -1,5 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
+export type GalleryMediaType = "image" | "video";
+
 export type GalleryPhoto = {
   id: string;
   title: string | null;
@@ -8,9 +10,17 @@ export type GalleryPhoto = {
   signedUrl: string;
   created_at: string;
   sort_order: number;
+  type: GalleryMediaType;
 };
 
 const BUCKET = "gallery";
+
+const VIDEO_EXTENSIONS = ["mp4", "webm", "mov", "m4v", "ogg"];
+
+export function getMediaType(path: string): GalleryMediaType {
+  const ext = path.split(".").pop()?.toLowerCase() ?? "";
+  return VIDEO_EXTENSIONS.includes(ext) ? "video" : "image";
+}
 
 export async function fetchGalleryPhotos(): Promise<GalleryPhoto[]> {
   const { data, error } = await supabase
@@ -37,5 +47,6 @@ export async function fetchGalleryPhotos(): Promise<GalleryPhoto[]> {
   return data.map((p) => ({
     ...p,
     signedUrl: urlByPath.get(p.storage_path) ?? "",
+    type: getMediaType(p.storage_path),
   }));
 }

@@ -144,7 +144,7 @@ function AdminPage() {
     e.preventDefault();
     const file = fileRef.current?.files?.[0];
     if (!file) {
-      toast.error("Selecione uma imagem.");
+      toast.error("Selecione uma imagem ou vídeo.");
       return;
     }
     setUploading(true);
@@ -210,7 +210,7 @@ function AdminPage() {
 
       <main className="mx-auto max-w-5xl px-4 py-10">
         <form onSubmit={handleUpload} className="rounded-2xl border border-border bg-card p-6 shadow-soft">
-          <h2 className="text-lg font-semibold">Enviar nova foto</h2>
+          <h2 className="text-lg font-semibold">Enviar nova foto ou vídeo</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="title">Título (opcional)</Label>
@@ -222,16 +222,16 @@ function AdminPage() {
             </div>
           </div>
           <div className="mt-4 space-y-1.5">
-            <Label htmlFor="file">Imagem</Label>
-            <Input id="file" ref={fileRef} type="file" accept="image/*" />
+            <Label htmlFor="file">Imagem ou vídeo</Label>
+            <Input id="file" ref={fileRef} type="file" accept="image/*,video/*" />
           </div>
           <Button type="submit" variant="hero" className="mt-5" disabled={uploading}>
             {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-            {uploading ? "Enviando..." : "Enviar foto"}
+            {uploading ? "Enviando..." : "Enviar"}
           </Button>
         </form>
 
-        <h2 className="mt-10 text-lg font-semibold">Fotos publicadas ({photos.length})</h2>
+        <h2 className="mt-10 text-lg font-semibold">Publicados ({photos.length})</h2>
         {isLoading ? (
           <p className="mt-4 text-sm text-muted-foreground">Carregando...</p>
         ) : photos.length === 0 ? (
@@ -240,7 +240,11 @@ function AdminPage() {
           <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {photos.map((p) => (
               <div key={p.id} className="group relative overflow-hidden rounded-xl border border-border">
-                <img src={p.signedUrl} alt={p.title ?? "Foto"} className="aspect-square w-full object-cover" />
+                {p.type === "video" ? (
+                  <video src={p.signedUrl} controls playsInline preload="metadata" className="aspect-square w-full object-cover" />
+                ) : (
+                  <img src={p.signedUrl} alt={p.title ?? "Foto"} className="aspect-square w-full object-cover" />
+                )}
                 <button
                   onClick={() => handleDelete(p.id, p.storage_path)}
                   className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-lg bg-destructive text-destructive-foreground opacity-0 shadow transition-opacity group-hover:opacity-100"
