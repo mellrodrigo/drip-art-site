@@ -222,16 +222,16 @@ function AdminPage() {
             </div>
           </div>
           <div className="mt-4 space-y-1.5">
-            <Label htmlFor="file">Imagem</Label>
-            <Input id="file" ref={fileRef} type="file" accept="image/*" />
+            <Label htmlFor="file">Imagem ou vídeo</Label>
+            <Input id="file" ref={fileRef} type="file" accept="image/*,video/*" />
           </div>
           <Button type="submit" variant="hero" className="mt-5" disabled={uploading}>
             {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-            {uploading ? "Enviando..." : "Enviar foto"}
+            {uploading ? "Enviando..." : "Enviar"}
           </Button>
         </form>
 
-        <h2 className="mt-10 text-lg font-semibold">Fotos publicadas ({photos.length})</h2>
+        <h2 className="mt-10 text-lg font-semibold">Publicados ({photos.length})</h2>
         {isLoading ? (
           <p className="mt-4 text-sm text-muted-foreground">Carregando...</p>
         ) : photos.length === 0 ? (
