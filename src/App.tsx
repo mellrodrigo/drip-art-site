@@ -210,7 +210,7 @@ function AdminPage() {
 
       <main className="mx-auto max-w-5xl px-4 py-10">
         <form onSubmit={handleUpload} className="rounded-2xl border border-border bg-card p-6 shadow-soft">
-          <h2 className="text-lg font-semibold">Enviar nova foto</h2>
+          <h2 className="text-lg font-semibold">Enviar nova foto ou vídeo</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="title">Título (opcional)</Label>
