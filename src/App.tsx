@@ -240,7 +240,11 @@ function AdminPage() {
           <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {photos.map((p) => (
               <div key={p.id} className="group relative overflow-hidden rounded-xl border border-border">
-                <img src={p.signedUrl} alt={p.title ?? "Foto"} className="aspect-square w-full object-cover" />
+                {p.type === "video" ? (
+                  <video src={p.signedUrl} controls playsInline preload="metadata" className="aspect-square w-full object-cover" />
+                ) : (
+                  <img src={p.signedUrl} alt={p.title ?? "Foto"} className="aspect-square w-full object-cover" />
+                )}
                 <button
                   onClick={() => handleDelete(p.id, p.storage_path)}
                   className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-lg bg-destructive text-destructive-foreground opacity-0 shadow transition-opacity group-hover:opacity-100"
