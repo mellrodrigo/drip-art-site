@@ -144,7 +144,7 @@ function AdminPage() {
     e.preventDefault();
     const file = fileRef.current?.files?.[0];
     if (!file) {
-      toast.error("Selecione uma imagem.");
+      toast.error("Selecione uma imagem ou vídeo.");
       return;
     }
     setUploading(true);
